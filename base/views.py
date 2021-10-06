@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth.models import User
-from .models import Room, Topic
+from .models import Message, Room, Topic
 from .forms import RoomForm
 from django.db.models import Q
 from django.contrib import messages
@@ -72,20 +72,45 @@ def home(request):
                                 )
     topics = Topic.objects.all()
     room_count = rooms.count()
+    room_messages = Message.objects.filter(Q(room__topic__name__icontains=q))
     context = {
         "rooms": rooms,
         "topics": topics,
-        "room_count": room_count
+        "room_count": room_count,
+        "room_messages": room_messages
     }
     return render(request, "base/home.html", context)
 
 
 def rooms(request, pk):
     room = Room.objects.get(pk=pk)
+    room_messages = room.message_set.all().order_by('-created')
+    participants = room.participants.all()
+    if request.method == "POST":
+        message = Message.objects.create(
+            user=request.user,
+            room=room,
+            body=request.POST.get("body")
+        )
+        room.participants.add(request.user)
+        return redirect("room-page", pk=room.id)
+
     context = {
-        "room": room
+        "room": room,
+        "room_messages": room_messages,
+        "participants": participants
     }
     return render(request, "base/room.html", context)
+
+
+def user_profile(request, pk):
+    user = User.objects.get(pk=pk)
+    room_messages = user.message_set.all()
+    topics = Topic.objects.all()
+    rooms = user.room_set.all()
+    context = {"user": user, "rooms": rooms,
+               "room_messages": room_messages, "topics": topics}
+    return render(request, "base/profile.html", context)
 
 
 @login_required(login_url="/login")
@@ -121,10 +146,21 @@ def update_room(request, pk):
 
 def delete_room(request, pk):
     obj = Room.objects.get(pk=pk)
-    if request.user != room.host:
+    if request.user != obj.host:
         return HttpResponse("you are not allowed to do that.")
     if request.method == "POST":
 
         obj.delete()
         return redirect("/")
     return render(request, "base/delete_room.html", {"obj": obj})
+
+
+def delete_message(request, pk):
+    message = Message.objects.get(pk=pk)
+    if request.user != message.user:
+        return HttpResponse("you are not allowed to do that.")
+    if request.method == "POST":
+
+        message.delete()
+        return redirect("/")
+    return render(request, "base/delete_room.html", {"obj": message})

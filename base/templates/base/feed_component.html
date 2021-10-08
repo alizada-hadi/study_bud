@@ -1,11 +1,31 @@
 <div class="roomList">
     <div class="mobile-menu">
-        
+        <form action="{% url 'home-page' %}" method="GET" class="header__search">
+            <label>
+                <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+                    <title>search</title>
+                    <path
+                        d="M32 30.586l-10.845-10.845c1.771-2.092 2.845-4.791 2.845-7.741 0-6.617-5.383-12-12-12s-12 5.383-12 12c0 6.617 5.383 12 12 12 2.949 0 5.649-1.074 7.741-2.845l10.845 10.845 1.414-1.414zM12 22c-5.514 0-10-4.486-10-10s4.486-10 10-10c5.514 0 10 4.486 10 10s-4.486 10-10 10z">
+                    </path>
+                </svg>
+                <input placeholder="Search for posts" name="q" />
+            </label>
+        </form>
         <div class="mobile-menuItems">
-            <a class="btn btn--main btn--pill" href="#">Browse Topics</a>
-            <a class="btn btn--main btn--pill" href="#">Recent Activities</a>
+            <a class="btn btn--main btn--pill" href="{% url 'topics' %}">Browse Topics</a>
+            <a class="btn btn--main btn--pill" href="{% url 'activity' %}">Recent Activities</a>
         </div>
     </div>
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == "success" %}
+                <div style="padding: 8px; background-color: green; border-radius: 6px; color: white; margin: 5px; font-size: 20px;">{{ message }}</div>
+            {% elif message.tags == "error" %}
+        <div style="padding: 8px; background-color: red; border-radius: 6px; color: white; margin: 5px; font-size: 20px;">
+            {{message }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
     <div class="roomList__header">
         <div>
             <h2>Study Room</h2>
@@ -26,7 +46,7 @@
             <div class="roomListRoom__header">
                 <a href="{% url 'profile' room.host.id %}" class="roomListRoom__author">
                     <div class="avatar avatar--small">
-                        <img src="https://randomuser.me/api/portraits/women/11.jpg" />
+                        <img src="{{  room.host.avatar.url }}" />
                     </div>
                     <span>@{{ room.host.username }}</span>
                 </a>

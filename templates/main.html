@@ -14,13 +14,7 @@
 <body>
     
 
-    {% if messages %}
-    <ul>
-        {% for message in messages %}
-        <li>{{message}}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+    
     {% include 'navbar.html' %}
 
     {% block content %}

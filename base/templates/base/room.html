@@ -75,7 +75,7 @@
                 <p>Hosted By</p>
                 <a href="{% url 'profile' room.host.id %}" class="room__author">
                   <div class="avatar avatar--small">
-                    <img src="https://randomuser.me/api/portraits/men/37.jpg" />
+                    <img src="{{ room.host.avatar.url }}" />
                   </div>
                   <span>@{{ user.username }}</span>
                 </a>
@@ -93,13 +93,13 @@
                       <div class="thread__author">
                         <a href="{% url 'profile' message.user.id %}" class="thread__authorInfo">
                           <div class="avatar avatar--small">
-                            <img src="https://randomuser.me/api/portraits/men/37.jpg" />
+                            <img src="{{ message.user.avatar.url }}" />
                           </div>
-                          <span>@{{ message.user.username }}</span>
+                          <span>{{ message.user.name }}</span>
                         </a>
                         <span class="thread__date">{{ message.created|timesince }} ago</span>
                       </div>
-                      {% if message.user == request.uesr %}
+                      {% if request.user == message.uesr %}
                         <a href="{% url 'delete-message' message.id %}">
                           <div class="thread__delete">
                             <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
@@ -122,9 +122,9 @@
           </div>
           <div class="room__message">
             {% if user.is_authenticated %}
-            <form action="#" method="POST">
+            <form action="" method="POST">
               {% csrf_token %}
-              <input name="" name="body" placeholder="Write your message here..." />
+              <input name="body" placeholder="Write your message here..." />
             </form>
             {% endif %}
           </div>
@@ -133,15 +133,15 @@
 
         <!--   Start -->
         <div class="participants">
-          <h3 class="participants__top">Participants <span>(5.3k Joined)</span></h3>
+          <h3 class="participants__top">Participants <span>({{ all_member }} Joined)</span></h3>
           <div class="participants__list scroll">
             {% for user in participants %}
               <a href="{% url 'profile' user.id %}" class="participant">
                 <div class="avatar avatar--medium">
-                  <img src="https://randomuser.me/api/portraits/men/37.jpg" />
+                  <img src="{{ user.avatar.url }}" />
                 </div>
                 <p>
-                  {{ user.username.title }}
+                  {{ user.name.title }}
                   <span>@{{ user.username }}</span>
                 </p>
               </a>
